@@ -1,83 +1,125 @@
-import java.net.*;
-import java.io.*;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Iterator;
 
 public class MovieParser {
 
-    public static void parseFrom(String site) throws Exception {
-        URL oracle = new URL(site);
-        BufferedReader in = new BufferedReader(
-                new InputStreamReader(oracle.openStream()));
+    private static void parseFrom(String site) throws Exception {
+        try {
+            Document doc = Jsoup.connect(site).get();
+            ArrayList<String> scores = new ArrayList<>();
+            ArrayList<String> movies = new ArrayList<>();
+            ArrayList<String> money = new ArrayList<>();
+            int g = 1;
 
-        String inputLine;
-        boolean flag = false;
-        boolean movie_name_flag = false;
-        ArrayList<String> scores = new ArrayList<>();
-        ArrayList<String> movies = new ArrayList<>();
+            if (site.contains("tomatoes")) {
 
-        if (site.contains("tomatoes")) {
-            while ((inputLine = in.readLine()) != null)
-                if (flag) {
-                    if (inputLine.contains("<script>")) {
-                        flag = false;
+                // MOVIES OPENING THIS WEEK
+                Element table = doc.select("table[id=Opening]").first();
+                Iterator<Element> opening = table.select("td").iterator();
 
-                    } else if (inputLine.contains("<span class=\"tMeterScore\">") || inputLine.contains("No Score Yet")){
-                        scores.add(inputLine);
-                    } else if (movie_name_flag){
-                        if (inputLine.contains("</td>")){
-                            movie_name_flag = false;
-                        } else{
-                            movies.add(inputLine);
+                ArrayList<String> cache = new ArrayList<>();
+                while (opening.hasNext()) {
+                    cache.add(opening.next().text());
+                }
+
+                for (String aCache : cache) {
+                    if (g != 3 && g != 6 && g != 9 && g != 12 && g != 15) {
+                        if (aCache.contains("%") || aCache.contains("No Score Yet")) {
+
+                            scores.add(aCache);
+                        } else {
+
+                            movies.add(aCache);
                         }
-                    } else if (inputLine.contains("<td class=\"middle_col\">")) {
-                        movie_name_flag = true;
                     }
-                } else if (inputLine.contains("<table id=\"Opening\" class=\"movie_list\">")) {
-                    flag = true;
+                    g++;
+                }
+
+                // TOP BOX OFFICE
+                table = doc.select("table[id=Top-Box-Office]").first();
+                Iterator<Element> top_box_office = table.select("td").iterator();
+                cache = new ArrayList<>();
+                while (top_box_office.hasNext()) {
+                    cache.add(top_box_office.next().text());
+                }
+                for (String aCache : cache) {
+                    if (aCache.contains("%") || aCache.contains("No Score Yet")) {
+                        scores.add(aCache);
+                    } else if (aCache.contains("$")){
+                        money.add(aCache);
+                    } else{
+                        movies.add(aCache);
+                    }
 
                 }
-        } else {
-            System.out.println("adasdsa");
 
-        }
+                //COMING SOON TO THEATERS
+                table = doc.select("table[id=Top-Coming-Soon]").first();
+                Iterator<Element> coming_soon = table.select("td").iterator();
+                cache = new ArrayList<>();
+                while (coming_soon.hasNext()) {
+                    cache.add(coming_soon.next().text());
+                }
+                g = 1;
+                for (String aCache : cache) {
+                    if (g != 3 && g != 6 && g != 9 && g != 12 && g != 15) {
+                        if (aCache.contains("%") || aCache.contains("No Score Yet")) {
+                            if (aCache.contains("No Score Yet")){
+                                scores.add("???");
+                            } else{
+                                scores.add(aCache);
+                            }
+                        } else {
 
+                            movies.add(aCache);
+                        }
+                    }
+                    g++;
+                }
 
-        for (int i = 0; i < scores.size(); i++){
-            scores.set( i, scores.get(i).replaceAll("\\s+",""));
-            scores.set( i, scores.get(i).replaceAll("<spanclass=\"tMeterScore\">",""));
-            scores.set( i, scores.get(i).replaceAll("<spanclass=\"tMeterIcontinynoRating\">",""));
-            scores.set( i, scores.get(i).replaceAll("</span>",""));
-            movies.set( i, movies.get(i).replaceAll("\\s+",""));
-            movies.set( i, movies.get(i).replaceAll("</a>",""));
-            for (String movie_name_split : movies.get(i).split(">", 2)) {
-                if (movie_name_split.contains("<")){
-                    movies.set( i, movies.get(i).replaceAll(movie_name_split,""));
-                    movies.set( i, movies.get(i).replaceAll(">",""));
+                for (int i = 0; i < scores.size(); i++) {
+                    switch(i) {
+                        case 0:
+                            System.out.println("\nMOVIES OPENING THIS WEEK\n");
+                            System.out.printf("%1s %1s %20s %1s%n", scores.get(i), "|", movies.get(i), "|");
+                            break;
+                        case 1:case 2:case 3:case 4:
+                            System.out.printf("%1s %1s %20s %1s%n", scores.get(i), "|", movies.get(i), "|");
+                            break;
+                        case 5:
+                            System.out.println("\nTOP BOX OFFICE\n");
+                            System.out.printf("%1s %1s %20s %1s %40s %1s%n", scores.get(i),  "|", money.get(i - 5), "|", movies.get(i), "|");
+                            break;
+                        case 6:case 7:case 8:case 9:case 10:case 11:case 12:case 13:case 14:
+                            System.out.printf("%1s %1s %20s %1s %40s %1s%n", scores.get(i),  "|", money.get(i - 5), "|", movies.get(i), "|");
+                            break;
+                        case 15:
+                            System.out.println("\nCOMING SOON TO THEATERS\n??? - No Score Yet\n");
+                            System.out.printf("%1s %1s %40s %1s%n", scores.get(i), "|", movies.get(i), "|");
+                            break;
+                        default:
+                            System.out.printf("%1s %1s %40s %1s%n", scores.get(i), "|", movies.get(i), "|");
+                            break;
+                    }
                 }
             }
+        }catch (IOException e) {
+            System.out.println("Error: " + e.getMessage());
         }
-        for (int i = 0; i < scores.size(); i++){
-
-            System.out.printf("%1s  %-7s   %20s%n", i + 1,  movies.get(i), scores.get(i));
-        }
-        in.close();
-    }
-
-    public static void table(){
-
     }
 
     public static void main(String[] args) {
         try{
-            //table();
             parseFrom("https://www.rottentomatoes.com/");
-            //parseFrom("asdsad");
 
         }
         catch(Exception e) {
-            System.out.println(e.getMessage());
+            System.out.println("Erroe" + e.getMessage());
         }
-
     }
 }
-
