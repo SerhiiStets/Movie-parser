@@ -1,0 +1,14 @@
+apply plugin: 'java'
+apply plugin: 'application'
+
+mainClassName = 'MovieParser' 
+version = '1.0'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies { 
+	compile group: 'org.jsoup', name: 'jsoup', version: '1.8.3' 
+	compile group: 'org.fusesource.jansi', name: 'jansi', version: '1.14'
+}

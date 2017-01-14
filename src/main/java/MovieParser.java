@@ -6,6 +6,10 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 
+import org.fusesource.jansi.AnsiConsole;
+import static org.fusesource.jansi.Ansi.*;
+import static org.fusesource.jansi.Ansi.Color.*;
+
 public class MovieParser {
 
     private static void parseFrom(String site) throws Exception {
@@ -86,22 +90,22 @@ public class MovieParser {
                     switch(i) {
                         case 0:
                             System.out.println("\nMOVIES OPENING THIS WEEK\n");
-                            System.out.printf("%1s %1s %20s %1s%n", scores.get(i), "|", movies.get(i), "|");
+                            System.out.printf("%1s %1s %20s %1s%n", ansi().fg(Integer.parseInt(scores.get(i).substring(0,scores.get(i).length()-1))>80?GREEN:YELLOW).a(scores.get(i)).reset(), "|", movies.get(i), "|");
                             break;
                         case 1:case 2:case 3:case 4:
-                            System.out.printf("%1s %1s %20s %1s%n", scores.get(i), "|", movies.get(i), "|");
+                            System.out.printf("%1s %1s %20s %1s%n", ansi().fg(Integer.parseInt(scores.get(i).substring(0,scores.get(i).length()-1))>80?GREEN:YELLOW).a(scores.get(i)).reset(), "|", movies.get(i), "|");
                             break;
                         case 5:
-                            System.out.println("\nTOP BOX OFFICE\n");
-                            System.out.printf("%1s %1s %20s %1s %40s %1s%n", scores.get(i),  "|", money.get(i - 5), "|", movies.get(i), "|");
-                            break;
+                             System.out.println("\nTOP BOX OFFICE\n");
+                             System.out.printf("%1s %1s %20s %1s %40s %1s%n",  ansi().fg(Integer.parseInt(scores.get(i).substring(0,scores.get(i).length()-1))>80?GREEN:YELLOW).a(scores.get(i)).reset(),  "|", money.get(i - 5), "|", movies.get(i), "|");
+                             break;
                         case 6:case 7:case 8:case 9:case 10:case 11:case 12:case 13:case 14:
-                            System.out.printf("%1s %1s %20s %1s %40s %1s%n", scores.get(i),  "|", money.get(i - 5), "|", movies.get(i), "|");
+                             System.out.printf("%1s %1s %20s %1s %40s %1s%n",  ansi().fg(Integer.parseInt(scores.get(i).substring(0,scores.get(i).length()-1))>80?GREEN:YELLOW).a(scores.get(i)).reset(),  "|", money.get(i - 5), "|", movies.get(i), "|");
                             break;
                         case 15:
-                            System.out.println("\nCOMING SOON TO THEATERS\n??? - No Score Yet\n");
-                            System.out.printf("%1s %1s %40s %1s%n", scores.get(i), "|", movies.get(i), "|");
-                            break;
+                             System.out.println("\nCOMING SOON TO THEATERS\n??? - No Score Yet\n");
+                             System.out.printf("%1s %1s %40s %1s%n", scores.get(i), "|", movies.get(i), "|");
+                             break;
                         default:
                             System.out.printf("%1s %1s %40s %1s%n", scores.get(i), "|", movies.get(i), "|");
                             break;
@@ -114,12 +118,13 @@ public class MovieParser {
     }
 
     public static void main(String[] args) {
+		AnsiConsole.systemUninstall();
         try{
             parseFrom("https://www.rottentomatoes.com/");
 
         }
         catch(Exception e) {
-            System.out.println("Erroe" + e.getMessage());
+            System.out.println("Error" + e.getMessage());
         }
     }
 }
