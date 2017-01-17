@@ -19,6 +19,10 @@ public class MovieParser {
             ArrayList<String> movies = new ArrayList<>();
             ArrayList<String> money = new ArrayList<>();
             int g = 1;
+            int max_1 = "Movies".length();
+            int max_2_1 = "$".length();
+            int max_2_2 = "Movies".length();
+            int max_3 = "Movies".length();
 
             if (site.contains("tomatoes")) {
 
@@ -34,11 +38,16 @@ public class MovieParser {
                 for (String aCache : cache) {
                     if (g != 3 && g != 6 && g != 9 && g != 12 && g != 15) {
                         if (aCache.contains("%") || aCache.contains("No Score Yet")) {
-
-                            scores.add(aCache);
+                            if (aCache.contains("No Score Yet")){
+                                scores.add("???");
+                            } else{
+                                scores.add(aCache);
+                            }
                         } else {
-
                             movies.add(aCache);
+                            if (aCache.length() > max_1){
+                                max_1 = aCache.length();
+                            }
                         }
                     }
                     g++;
@@ -56,8 +65,14 @@ public class MovieParser {
                         scores.add(aCache);
                     } else if (aCache.contains("$")){
                         money.add(aCache);
+                        if (aCache.length() > max_2_1){
+                            max_2_1 = aCache.length();
+                        }
                     } else{
                         movies.add(aCache);
+                        if (aCache.length() > max_2_2){
+                            max_2_2 = aCache.length();
+                        }
                     }
 
                 }
@@ -79,8 +94,10 @@ public class MovieParser {
                                 scores.add(aCache);
                             }
                         } else {
-
                             movies.add(aCache);
+                            if (aCache.length() > max_3){
+                                max_3 = aCache.length();
+                            }
                         }
                     }
                     g++;
@@ -89,35 +106,45 @@ public class MovieParser {
                 for (int i = 0; i < scores.size(); i++) {
                     switch(i) {
                         case 0:
-                            System.out.printf("%1s %20s %1s%n", "\nMOVIES OPENING THIS WEEK\n\n| Rotten Tomatoes |", "Movies", "|");
-                            System.out.printf("%1s %17s %22s%n", "|", "|", "|");
-                            System.out.printf("%1s %1s %7s %20s %1s%n", "|", ansi().fg(Integer.parseInt(scores.get(i).substring(0,scores.get(i).length()-1))>60?GREEN:RED).a("      " + scores.get(i)).reset(), "|", movies.get(i), "|");
+                            System.out.println(ansi().render("@|blue ???|@ - No Score Yet\n"));
+                            System.out.printf("%1s %"+ max_1 + "s %1s%n", "\nMOVIES OPENING THIS WEEK\n\n| Rotten Tomatoes |", "Movies", "|");
+                            System.out.printf("%1s %17s %"+ (max_1+2) + "s%n", "|", "|", "|");
+                            if (scores.get(i).contains("?")){
+                                System.out.printf("%1s %1s %7s %"+ max_1 + "s %1s%n", "|",  ansi().fg(BLUE).a("      " + scores.get(i)).reset(), "|", movies.get(i), "|");
+                            } else {
+                                System.out.printf("%1s %1s %7s %"+ max_1 + "s %1s%n", "|", ansi().fg(Integer.parseInt(scores.get(i).substring(0, scores.get(i).length() - 1)) > 60 ? GREEN : RED).a("      " + scores.get(i)).reset(), "|", movies.get(i), "|");
+                            }
                             break;
                         case 1:case 2:case 3:case 4:
-                            System.out.printf("%1s %1s %7s %20s %1s%n", "|", ansi().fg(Integer.parseInt(scores.get(i).substring(0,scores.get(i).length()-1))>60?GREEN:RED).a("      " + scores.get(i)).reset(), "|", movies.get(i), "|");
+                            if (scores.get(i).contains("?")){
+                                System.out.printf("%1s %1s %7s %"+ max_1 + "s %1s%n", "|",  ansi().fg(BLUE).a("      " + scores.get(i)).reset(), "|", movies.get(i), "|");
+                            } else {
+                                System.out.printf("%1s %1s %7s %"+ max_1 + "s %1s%n", "|", ansi().fg(Integer.parseInt(scores.get(i).substring(0, scores.get(i).length() - 1)) > 60 ? GREEN : RED).a("      " + scores.get(i)).reset(), "|", movies.get(i), "|");
+                            }
                             break;
                         case 5:
-                            System.out.println("\nTOP BOX OFFICE\n\n| Rotten Tomatoes |\n|                 |");
-                            System.out.printf("%1s %1s %7s %20s %1s %40s %1s%n", "|",  ansi().fg(Integer.parseInt(scores.get(i).substring(0,scores.get(i).length()-1))>60?GREEN:RED).a("      " + scores.get(i)).reset(),  "|", money.get(i - 5), "|", movies.get(i), "|");
+                            System.out.printf("%1s %"+ max_2_1 + "s %1s %" + max_2_2 + "s %1s%n", "\nTOP BOX OFFICE\n\n| Rotten Tomatoes |", "$", "|", "Movies", "|");
+                            System.out.printf("%1s %17s %"+ (max_2_1+2) + "s %" + (max_2_2+2) + "s%n", "|", "|", "|", "|");
+                            System.out.printf("%1s %1s %7s %" + max_2_1 + "s %1s %" + max_2_2 + "s %1s%n", "|",  ansi().fg(Integer.parseInt(scores.get(i).substring(0,scores.get(i).length()-1))>60?GREEN:RED).a("      " + scores.get(i)).reset(),  "|", money.get(i - 5), "|", movies.get(i), "|");
                             break;
                         case 6:case 7:case 8:case 9:case 10:case 11:case 12:case 13:case 14:
-                            System.out.printf("%1s %1s %7s %20s %1s %40s %1s%n", "|",  ansi().fg(Integer.parseInt(scores.get(i).substring(0,scores.get(i).length()-1))>60?GREEN:RED).a("      " + scores.get(i)).reset(),  "|", money.get(i - 5), "|", movies.get(i), "|");
+                            System.out.printf("%1s %1s %7s %" + max_2_1 + "s %1s %" + max_2_2 + "s %1s%n", "|",  ansi().fg(Integer.parseInt(scores.get(i).substring(0,scores.get(i).length()-1))>60?GREEN:RED).a("      " + scores.get(i)).reset(),  "|", money.get(i - 5), "|", movies.get(i), "|");
                             break;
                         case 15:
-                            System.out.println(ansi().render("\nCOMING SOON TO THEATERS\n@|blue ???|@ - No Score Yet\n"));
-                            System.out.printf("%1s %40s %1s%n","| Rotten Tomatoes |", "Movies", "|");
-                            System.out.printf("%1s %17s %42s%n", "|", "|", "|");
+                            System.out.println(ansi().render("\nCOMING SOON TO THEATERS\n"));
+                            System.out.printf("%1s %" + max_3 + "s %1s%n","| Rotten Tomatoes |", "Movies", "|");
+                            System.out.printf("%1s %17s %" + (max_3+2) + "s%n", "|", "|", "|");
                             if (scores.get(i).contains("?")){
-                                System.out.printf("%1s %1s %7s %40s %1s%n", "|",  ansi().fg(BLUE).a("      " + scores.get(i)).reset(), "|", movies.get(i), "|");
+                                System.out.printf("%1s %1s %7s %" + max_3 + "s %1s%n", "|",  ansi().fg(BLUE).a("      " + scores.get(i)).reset(), "|", movies.get(i), "|");
                             } else {
-                                System.out.printf("%1s %1s %7s %40s %1s%n", "|", ansi().fg(Integer.parseInt(scores.get(i).substring(0,scores.get(i).length()-1))>60?GREEN:RED).a("      " + scores.get(i)).reset(), "|", movies.get(i), "|");
+                                System.out.printf("%1s %1s %7s %" + max_3 + "s %1s%n", "|", ansi().fg(Integer.parseInt(scores.get(i).substring(0,scores.get(i).length()-1))>60?GREEN:RED).a("      " + scores.get(i)).reset(), "|", movies.get(i), "|");
                             }
                             break;
                         default:
                             if (scores.get(i).contains("?")){
-                                System.out.printf("%1s %1s %7s %40s %1s%n", "|",  ansi().fg(BLUE).a(scores.get(i)).reset(), "|", movies.get(i), "|");
+                                System.out.printf("%1s %1s %7s %" + max_3 + "s %1s%n", "|",  ansi().fg(BLUE).a("      " + scores.get(i)).reset(), "|", movies.get(i), "|");
                             } else {
-                                System.out.printf("%1s %1s %7s %40s %1s%n", "|", ansi().fg(Integer.parseInt(scores.get(i).substring(0,scores.get(i).length()-1))>60?GREEN:RED).a("      " + scores.get(i)).reset(), "|", movies.get(i), "|");
+                                System.out.printf("%1s %1s %7s %" + max_3 + "s %1s%n", "|", ansi().fg(Integer.parseInt(scores.get(i).substring(0,scores.get(i).length()-1))>60?GREEN:RED).a("      " + scores.get(i)).reset(), "|", movies.get(i), "|");
                             }
                             break;
                     }
