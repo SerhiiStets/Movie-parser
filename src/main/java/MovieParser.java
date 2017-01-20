@@ -14,6 +14,24 @@ import org.jsoup.select.Elements;
 import static org.fusesource.jansi.Ansi.*;
 
 public class MovieParser {
+    private static void console(){
+        System.out.print("> ");
+
+    }
+
+    private static void instructions(){
+        // instruction block
+        System.out.println("\nINSTRUCTION\n");
+        System.out.println("\tRotten Tomatoes:");
+        System.out.println(ansi().render("\t\t@|green 96%|@ - (Fresh) The Tomatometer is @|green 60%|@ or higher"));
+        System.out.println(ansi().render("\t\t@|red 33%|@ - (Rotten) The Tomatometer is @|red 59%|@ or lower"));
+        System.out.println(ansi().render("\t\t@|cyan ???|@ - No Score Yet\n"));
+        System.out.println("\tMetacritic:");
+        System.out.println(ansi().render("\t\t@|green 85|@ - (@|green 61|@ - @|green 100|@) Universal Acclaim / Generally Favorable Reviews"));
+        System.out.println(ansi().render("\t\t@|yellow 53|@ - (@|yellow 40|@ - @|yellow 60|@) Mixed or Average Reviews"));
+        System.out.println(ansi().render("\t\t@|red 27|@ - (@|red 0|@ - @|red 39|@) Generally Unfavorable Reviews / Overwhelming Dislike"));
+        System.out.println(ansi().render("\t\t@|cyan ??|@ - No Score Yet"));
+    }
 
     private static void parseFrom() throws Exception {
         try {
@@ -131,7 +149,7 @@ public class MovieParser {
                 i++;
             }
 
-            System.out.println(ansi().render("\n@|cyan ???|@/@|cyan ??|@ - No Score Yet\n"));
+            // Show movies opening this week section
             System.out.println("\nMOVIES OPENING THIS WEEK\n");
             System.out.printf("%1s %"+ (max_1 % 2 == 0?((max_1 + 2) /2 + 2 ):((max_1 + 2) /2 + 3 )) + "s %" + ((max_1 / 2) -2) + "s%n", "| Rotten Tomatoes | Metacritic |", "Movies", "|");
             System.out.printf("%1s %17s %12s %" + (max_1 + 2) + "s%n", "|", "|", "|", "|");
@@ -139,19 +157,20 @@ public class MovieParser {
                 for (g = 0; g < movies_meta.size(); g++){
                     if (Objects.equals(movies_meta.get(g), movies.get(i))){
                         System.out.printf("%1s %9s %7s %6s %5s %1s %"+ (max_1 - movies.get(i).length() + 1) + "s%n", "|",
-                                ansi().render("      @|" + (scores.get(i).contains("?")? "cyan ": (Integer.parseInt(scores.get(i).substring(0, scores.get(i).length() - 1)) > 60? "green ":"red ")) + scores.get(i) + "|@"),
+                                ansi().render("      @|" + (scores.get(i).contains("?")? "cyan ": (Integer.parseInt(scores.get(i).substring(0, scores.get(i).length() - 1)) >= 60? "green ":"red ")) + scores.get(i) + "|@"),
                                 "|",
-                                ansi().render("    @|" + (scores_meta.get(g).contains("?")? "cyan ": Integer.parseInt(scores_meta.get(g).substring(0, scores_meta.get(g).length())) > 60? "green ":"red ") + scores_meta.get(g) + "|@"),
+                                ansi().render("    @|" + (scores_meta.get(g).contains("?")? "cyan ": Integer.parseInt(scores_meta.get(g).substring(0, scores_meta.get(g).length())) > 60? "green ":Integer.parseInt(scores_meta.get(g).substring(0, scores_meta.get(g).length())) >= 40? "yellow ":"red ") + scores_meta.get(g) + "|@"),
                                 "|", movies.get(i), "|");
                         break;
                     } else if (g == movies_meta.size() - 1 ){
                         System.out.printf("%1s %9s %7s %6s %5s %1s %"+ (max_1 - movies.get(i).length() + 1) + "s%n", "|",
-                                ansi().render("      @|" + (scores.get(i).contains("?")? "cyan ": (Integer.parseInt(scores.get(i).substring(0, scores.get(i).length() - 1)) > 60? "green ":"red ")) + scores.get(i) + "|@"),
+                                ansi().render("      @|" + (scores.get(i).contains("?")? "cyan ": (Integer.parseInt(scores.get(i).substring(0, scores.get(i).length() - 1)) >= 60? "green ":"red ")) + scores.get(i) + "|@"),
                                 "|", ansi().render("    @|cyan ??|@"), "|", movies.get(i), "|");
                     }
                 }
             }
 
+            // Show top box office section
             System.out.println("\nTOP BOX OFFICE\n");
             System.out.printf("%1s %" + max_2_1 + "s %1s %" + (max_2_2 % 2 == 0?((max_2_2 + 2) /2 + 2 ):((max_2_2 + 2) /2 + 3 )) + "s %" + ((max_2_2 / 2) -2) + "s%n", "| Rotten Tomatoes | Metacritic |", "$", "|", "Movies", "|");
             System.out.printf("%1s %17s %12s %" + (max_2_1 + 2) + "s %" + (max_2_2 + 2) + "s%n", "|", "|", "|", "|", "|");
@@ -159,19 +178,20 @@ public class MovieParser {
                 for (g = 0; g < movies_meta.size(); g++){
                     if (Objects.equals(movies_meta.get(g), movies.get(i))){
                         System.out.printf("%1s %9s %7s %6s %5s %" + max_2_1 + "s %1s %1s %"+ (max_2_2 - movies.get(i).length() + 1) + "s%n", "|",
-                                ansi().render("      @|" + (scores.get(i).contains("?")? "cyan ": (Integer.parseInt(scores.get(i).substring(0, scores.get(i).length() - 1)) > 60? "green ":"red ")) + scores.get(i) + "|@"),
+                                ansi().render("      @|" + (scores.get(i).contains("?")? "cyan ": (Integer.parseInt(scores.get(i).substring(0, scores.get(i).length() - 1)) >= 60? "green ":"red ")) + scores.get(i) + "|@"),
                                 "|",
-                                ansi().render("    @|" + (scores_meta.get(g).contains("?")? "cyan ": Integer.parseInt(scores_meta.get(g).substring(0, scores_meta.get(g).length())) > 60? "green ":"red ") + scores_meta.get(g) + "|@"),
+                                ansi().render("    @|" + (scores_meta.get(g).contains("?")? "cyan ": Integer.parseInt(scores_meta.get(g).substring(0, scores_meta.get(g).length())) > 60? "green ":Integer.parseInt(scores_meta.get(g).substring(0, scores_meta.get(g).length())) >= 40? "yellow ":"red ") + scores_meta.get(g) + "|@"),
                                 "|", money.get(i - 5), "|", movies.get(i), "|");
                         break;
                     } else if (g == movies_meta.size() - 1){
                         System.out.printf("%1s %9s %7s %6s %5s %" + max_2_1 + "s %1s %1s %"+ (max_2_2 - movies.get(i).length() + 1) + "s%n", "|",
-                                ansi().render("      @|" + (scores.get(i).contains("?")? "cyan ": (Integer.parseInt(scores.get(i).substring(0, scores.get(i).length() - 1)) > 60? "green ":"red ")) + scores.get(i) + "|@"),
+                                ansi().render("      @|" + (scores.get(i).contains("?")? "cyan ": (Integer.parseInt(scores.get(i).substring(0, scores.get(i).length() - 1)) >= 60? "green ":"red ")) + scores.get(i) + "|@"),
                                 "|", ansi().render("    @|cyan ??|@"), "|", money.get(i - 5), "|", movies.get(i), "|");
                     }
                 }
             }
 
+            // Show coming soon to theaters section
             System.out.println("\nCOMING SOON TO THEATERS\n");
             System.out.printf("%1s %"+ (max_3 % 2 == 0?((max_3 + 2) /2 + 2 ):((max_3 + 2) /2 + 3 )) + "s %" + ((max_3 / 2) -2) + "s%n", "| Rotten Tomatoes | Metacritic |", "Movies", "|");
             System.out.printf("%1s %17s %12s %" + (max_3 + 2) + "s%n", "|", "|", "|", "|");
@@ -179,14 +199,14 @@ public class MovieParser {
                 for (g = 0; g < movies_meta.size(); g++){
                     if (Objects.equals(movies_meta.get(g), movies.get(i))){
                         System.out.printf("%1s %9s %7s %6s %5s %1s %"+ (max_3 - movies.get(i).length() + 1) + "s%n", "|",
-                                ansi().render("@|" + (scores.get(i).contains("?")? "cyan ": (Integer.parseInt(scores.get(i).substring(0, scores.get(i).length() - 1)) > 60? "green":"red")) + scores.get(i) + "|@"),
+                                ansi().render("@|" + (scores.get(i).contains("?")? "cyan ": (Integer.parseInt(scores.get(i).substring(0, scores.get(i).length() - 1)) >= 60? "green":"red")) + scores.get(i) + "|@"),
                                 "|",
-                                ansi().render("    @|" + (scores_meta.get(g).contains("?")? "cyan ": Integer.parseInt(scores_meta.get(g).substring(0, scores_meta.get(g).length())) > 60? "green ":"red ") + scores_meta.get(g) + "|@"),
+                                ansi().render("    @|" + (scores_meta.get(g).contains("?")? "cyan ": Integer.parseInt(scores_meta.get(g).substring(0, scores_meta.get(g).length())) > 60? "green ":Integer.parseInt(scores_meta.get(g).substring(0, scores_meta.get(g).length())) >= 40? "yellow ":"red ") + scores_meta.get(g) + "|@"),
                                 "|", movies.get(i), "|");
                         break;
                     } else if (g == movies_meta.size() - 1){
                         System.out.printf("%1s %1s %7s %6s %5s %1s %"+ (max_3 - movies.get(i).length() + 1) + "s%n", "|",
-                                ansi().render("      @|" + (scores.get(i).contains("?")? "cyan ": (Integer.parseInt(scores.get(i).substring(0, scores.get(i).length() - 1)) > 60? "green ":"red ")) + scores.get(i) + "|@"),
+                                ansi().render("      @|" + (scores.get(i).contains("?")? "cyan ": (Integer.parseInt(scores.get(i).substring(0, scores.get(i).length() - 1)) >= 60? "green ":"red ")) + scores.get(i) + "|@"),
                                 "|", ansi().render("    @|cyan ??|@"), "|", movies.get(i), "|");
                     }
                 }
@@ -200,11 +220,11 @@ public class MovieParser {
     public static void main(String[] args) {
 		AnsiConsole.systemUninstall();
         try{
+            instructions();
             parseFrom();
-
         }
         catch(Exception e) {
-            System.out.println("Error" + e.getMessage());
+            System.out.println("Error: " + e.getMessage());
         }
     }
 }
