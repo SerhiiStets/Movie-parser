@@ -1,6 +1,7 @@
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -8,19 +9,18 @@ import java.util.Iterator;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-import org.fusesource.jansi.AnsiConsole;
-import org.jsoup.select.Elements;
+import static org.fusesource.jansi.Ansi.ansi;
 
-import static org.fusesource.jansi.Ansi.*;
+/**
+ * @author Serhii Stets
+ * @version 1.0
+ * @project movie-parser
+ * @date 01.02.2017
+ */
 
-public class MovieParser {
-    private static void console(){
-        System.out.print("> ");
-
-    }
-
+public class Main {
     private static void instructions(){
-        // instruction block
+        // Instruction block
         System.out.println("\nINSTRUCTION\n");
         System.out.println("\tRotten Tomatoes:");
         System.out.println(ansi().render("\t\t@|green 96%|@ - (Fresh) The Tomatometer is @|green 60%|@ or higher"));
@@ -35,14 +35,14 @@ public class MovieParser {
 
     private static void parseFrom() throws Exception {
         try {
-            Document doc = Jsoup.connect("https://www.rottentomatoes.com/").get();
-            ArrayList<String> scores = new ArrayList<>();
-            ArrayList<String> movies = new ArrayList<>();
-            ArrayList<String> money = new ArrayList<>();
-            ArrayList<String> scores_meta = new ArrayList<>();
-            ArrayList<String> movies_meta = new ArrayList<>();
+            ArrayList<String> scores = new ArrayList<>(); // All scores from Rotten Tomatoes
+            ArrayList<String> movies = new ArrayList<>(); // Movie names from Rotten Tomatoes
+            ArrayList<String> money = new ArrayList<>(); // Box office from Rotten Tomatoes
+            ArrayList<String> scores_meta = new ArrayList<>(); //  All scores from Metacritic
+            ArrayList<String> movies_meta = new ArrayList<>(); // Movie names from Metacritic
             int g = 1;
             int i = 0;
+            // Variables for table width
             int max_1 = "Movies".length();
             int max_2_1 = "$".length();
             int max_2_2 = "Movies".length();
@@ -50,24 +50,33 @@ public class MovieParser {
 
 
             // MOVIES OPENING THIS WEEK
-            Element table = doc.select("table[id=Opening]").first();
-            Iterator<Element> opening = table.select("td").iterator();
+            Document doc = Jsoup.connect("https://www.rottentomatoes.com/").get(); // Connect to Rotten Tomatoes
+            Element table = doc.select("table[id=Opening]").first(); // Get all information from table with id "Opening"
+            Iterator<Element> opening = table.select("td").iterator(); // Get info from td
 
-            ArrayList<String> cache = new ArrayList<>();
+            ArrayList<String> cache = new ArrayList<>(); // Temporary array for all data
             while (opening.hasNext()) {
-                cache.add(opening.next().text());
+                cache.add(opening.next().text()); // While Iterator has next character we add text from our table
             }
 
+            // Split array
             for (String aCache : cache) {
+                // We have 5 movies, 5 scores and 5 dates at all, so we need to skip date elements
                 if (g != 3 && g != 6 && g != 9 && g != 12 && g != 15) {
+                    // Take scores
                     if (aCache.contains("%") || aCache.contains("No Score Yet")) {
+                        // If movie doesn't have score right now and if it does
                         if (aCache.contains("No Score Yet")){
                             scores.add("???");
                         } else{
                             scores.add(aCache);
                         }
-                    } else {
+                    }
+                    // Take movies
+                    else {
                         movies.add(aCache);
+
+                        // Find msx length movie for table width
                         if (aCache.length() > max_1){
                             max_1 = aCache.length();
                         }
@@ -77,22 +86,26 @@ public class MovieParser {
             }
 
             // TOP BOX OFFICE
-            table = doc.select("table[id=Top-Box-Office]").first();
-            Iterator<Element> top_box_office = table.select("td").iterator();
-            cache = new ArrayList<>();
+            table = doc.select("table[id=Top-Box-Office]").first(); // Get all information from table with id Top-Box-Office
+            Iterator<Element> top_box_office = table.select("td").iterator(); // Get information from td
+            cache = new ArrayList<>(); // Clear cache array
+            // Add all info from table
             while (top_box_office.hasNext()) {
                 cache.add(top_box_office.next().text());
             }
+            // Do the same as in "MOVIES OPENING THIS WEEK" but now we have instead of date elements money elements which we collect
             for (String aCache : cache) {
                 if (aCache.contains("%") || aCache.contains("No Score Yet")) {
                     scores.add(aCache);
                 } else if (aCache.contains("$")){
                     money.add(aCache);
+                    // Find msx length number for table width
                     if (aCache.length() > max_2_1){
                         max_2_1 = aCache.length();
                     }
                 } else{
                     movies.add(aCache);
+                    // Find msx length movie for table width
                     if (aCache.length() > max_2_2){
                         max_2_2 = aCache.length();
                     }
@@ -109,6 +122,7 @@ public class MovieParser {
             }
             g = 1;
             for (String aCache : cache) {
+                // Skip data elements
                 if (g != 3 && g != 6 && g != 9 && g != 12 && g != 15) {
                     if (aCache.contains("%") || aCache.contains("No Score Yet")) {
                         if (aCache.contains("No Score Yet")){
@@ -118,6 +132,7 @@ public class MovieParser {
                         }
                     } else {
                         movies.add(aCache);
+                        // Find msx length movie for table width
                         if (aCache.length() > max_3){
                             max_3 = aCache.length();
                         }
@@ -126,23 +141,28 @@ public class MovieParser {
                 g++;
             }
 
+            // I have some troubles with Metacritic website so i take metascore from imdb.com instead
             doc = Jsoup.connect("http://www.imdb.com/movies-in-theaters/?ref_=nv_mv_inth_1").timeout(0).get();
-            Elements elements = doc.select(".overview-top");
+            Elements elements = doc.select(".overview-top"); // Take all elements in classes
             cache = new ArrayList<>();
             for (Element e : elements) {
-                Elements elements1 = e.select("h4[itemprop=\"name\"]");
-                cache.addAll(elements1.stream().map(e1 -> e1.text().replaceAll(" \\(\\d+\\)", "").replace(" - [Limited]", "")).collect(Collectors.toList()));
+                Elements elements1 = e.select("h4[itemprop=\"name\"]"); // Take movie name from itemprop
+                cache.addAll(elements1.stream().map(e1 -> e1.text().replaceAll(" \\(\\d+\\)",
+                        "").replace(" - [Limited]", "")).collect(Collectors.toList())); // Delete info in brackets and " - [Limited]"
 
-                Elements element2 = e.select(".metascore");
-                cache.addAll(element2.stream().map(Element::text).collect(Collectors.toList()));
+                Elements element2 = e.select(".metascore"); // Take metascore
+                cache.addAll(element2.stream().map(Element::text).collect(Collectors.toList())); // Add to our list
             }
-
+            // My metascore element now looks like "Metascore: 43/100 (11 reviews)", we need to delete all after "/" and "Metascore: "
             while (i < cache.size()-1){
+                // If next element have "Metascore" in it
                 if (cache.get(i+1).contains("Metascore")){
                     movies_meta.add(cache.get(i));
                     scores_meta.add(cache.get(i+1).replace("Metascore: ", "").split("/")[0]);
                     i++;
-                } else{
+                }
+                // If movie don't have score
+                else{
                     movies_meta.add(cache.get(i));
                     scores_meta.add("??");
                 }
@@ -218,7 +238,6 @@ public class MovieParser {
     }
 
     public static void main(String[] args) {
-		AnsiConsole.systemUninstall();
         try{
             instructions();
             parseFrom();
