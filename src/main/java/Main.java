@@ -18,8 +18,8 @@ import static org.fusesource.jansi.Ansi.ansi;
  * @date 01.02.2017
  */
 
-public class Main {
-    private static void instructions(){
+class output{
+    public static void instructions(){
         // Instruction block
         System.out.println("\nINSTRUCTION\n");
         System.out.println("\tRotten Tomatoes:");
@@ -32,7 +32,12 @@ public class Main {
         System.out.println(ansi().render("\t\t@|red 27|@ - (@|red 0|@ - @|red 39|@) Generally Unfavorable Reviews / Overwhelming Dislike"));
         System.out.println(ansi().render("\t\t@|cyan ??|@ - No Score Yet"));
     }
+    public static void printTable(){
+        instructions();
+    }
+}
 
+public class Main {
     private static void parseFrom() throws Exception {
         try {
             ArrayList<String> scores = new ArrayList<>(); // All scores from Rotten Tomatoes
@@ -69,7 +74,13 @@ public class Main {
                         if (aCache.contains("No Score Yet")){
                             scores.add("???");
                         } else{
-                            scores.add(aCache);
+                            if (Objects.equals(aCache, "100%")){
+                                scores.add("100");
+                            } else if (aCache.length() <= 2){
+                                scores.add(aCache);
+                            } else {
+                                scores.add(aCache);
+                            }
                         }
                     }
                     // Take movies
@@ -96,7 +107,17 @@ public class Main {
             // Do the same as in "MOVIES OPENING THIS WEEK" but now we have instead of date elements money elements which we collect
             for (String aCache : cache) {
                 if (aCache.contains("%") || aCache.contains("No Score Yet")) {
-                    scores.add(aCache);
+                    if (aCache.contains("No Score Yet")){
+                        scores.add("???");
+                    } else {
+                        if (Objects.equals(aCache, "100%")){
+                            scores.add("100");
+                        } else if (aCache.length() <= 2){
+                            scores.add(" " + aCache);
+                        } else {
+                            scores.add(aCache);
+                        }
+                    }
                 } else if (aCache.contains("$")){
                     money.add(aCache);
                     // Find msx length number for table width
@@ -128,7 +149,13 @@ public class Main {
                         if (aCache.contains("No Score Yet")){
                             scores.add("???");
                         } else{
-                            scores.add(aCache);
+                            if (Objects.equals(aCache, "100%")){
+                                scores.add("100");
+                            } else if (aCache.length() <= 2){
+                                scores.add(" " + aCache);
+                            } else {
+                                scores.add(aCache);
+                            }
                         }
                     } else {
                         movies.add(aCache);
@@ -177,14 +204,16 @@ public class Main {
                 for (g = 0; g < movies_meta.size(); g++){
                     if (Objects.equals(movies_meta.get(g), movies.get(i))){
                         System.out.printf("%1s %9s %7s %6s %5s %1s %"+ (max_1 - movies.get(i).length() + 1) + "s%n", "|",
-                                ansi().render("      @|" + (scores.get(i).contains("?")? "cyan ": (Integer.parseInt(scores.get(i).substring(0, scores.get(i).length() - 1)) >= 60? "green ":"red ")) + scores.get(i) + "|@"),
+                                ansi().render("      @|" + (scores.get(i).contains("?")? "cyan ": (Integer.parseInt(scores.get(i).substring(0,
+                                        scores.get(i).length() - 1)) >= 60 || scores.get(i).contains("100")? "green ":"red ")) + (scores.get(i).length() <= 2? " " + scores.get(i):scores.get(i)) + "|@"),
                                 "|",
                                 ansi().render("    @|" + (scores_meta.get(g).contains("?")? "cyan ": Integer.parseInt(scores_meta.get(g).substring(0, scores_meta.get(g).length())) > 60? "green ":Integer.parseInt(scores_meta.get(g).substring(0, scores_meta.get(g).length())) >= 40? "yellow ":"red ") + scores_meta.get(g) + "|@"),
                                 "|", movies.get(i), "|");
                         break;
                     } else if (g == movies_meta.size() - 1 ){
                         System.out.printf("%1s %9s %7s %6s %5s %1s %"+ (max_1 - movies.get(i).length() + 1) + "s%n", "|",
-                                ansi().render("      @|" + (scores.get(i).contains("?")? "cyan ": (Integer.parseInt(scores.get(i).substring(0, scores.get(i).length() - 1)) >= 60? "green ":"red ")) + scores.get(i) + "|@"),
+                                ansi().render("      @|" + (scores.get(i).contains("?")? "cyan ": (Integer.parseInt(scores.get(i).substring(0,
+                                        scores.get(i).length() - 1)) >= 60 || scores.get(i).contains("100")? "green ":"red ")) + (scores.get(i).length() <= 2? " " + scores.get(i):scores.get(i)) + "|@"),
                                 "|", ansi().render("    @|cyan ??|@"), "|", movies.get(i), "|");
                     }
                 }
@@ -198,14 +227,16 @@ public class Main {
                 for (g = 0; g < movies_meta.size(); g++){
                     if (Objects.equals(movies_meta.get(g), movies.get(i))){
                         System.out.printf("%1s %9s %7s %6s %5s %" + max_2_1 + "s %1s %1s %"+ (max_2_2 - movies.get(i).length() + 1) + "s%n", "|",
-                                ansi().render("      @|" + (scores.get(i).contains("?")? "cyan ": (Integer.parseInt(scores.get(i).substring(0, scores.get(i).length() - 1)) >= 60? "green ":"red ")) + scores.get(i) + "|@"),
+                                ansi().render("      @|" + (scores.get(i).contains("?")? "cyan ": (Integer.parseInt(scores.get(i).substring(0,
+                                        scores.get(i).length() - 1)) >= 60 ||scores.get(i).contains("100")? "green ":"red ")) + (scores.get(i).length() <= 2? " " + scores.get(i):scores.get(i)) + "|@"),
                                 "|",
                                 ansi().render("    @|" + (scores_meta.get(g).contains("?")? "cyan ": Integer.parseInt(scores_meta.get(g).substring(0, scores_meta.get(g).length())) > 60? "green ":Integer.parseInt(scores_meta.get(g).substring(0, scores_meta.get(g).length())) >= 40? "yellow ":"red ") + scores_meta.get(g) + "|@"),
                                 "|", money.get(i - 5), "|", movies.get(i), "|");
                         break;
                     } else if (g == movies_meta.size() - 1){
                         System.out.printf("%1s %9s %7s %6s %5s %" + max_2_1 + "s %1s %1s %"+ (max_2_2 - movies.get(i).length() + 1) + "s%n", "|",
-                                ansi().render("      @|" + (scores.get(i).contains("?")? "cyan ": (Integer.parseInt(scores.get(i).substring(0, scores.get(i).length() - 1)) >= 60? "green ":"red ")) + scores.get(i) + "|@"),
+                                ansi().render("      @|" + (scores.get(i).contains("?")? "cyan ": (Integer.parseInt(scores.get(i).substring(0,
+                                        scores.get(i).length() - 1)) >= 60 || scores.get(i).contains("100")? "green ":"red ")) + (scores.get(i).length() <= 2? " " + scores.get(i):scores.get(i)) + "|@"),
                                 "|", ansi().render("    @|cyan ??|@"), "|", money.get(i - 5), "|", movies.get(i), "|");
                     }
                 }
@@ -219,14 +250,16 @@ public class Main {
                 for (g = 0; g < movies_meta.size(); g++){
                     if (Objects.equals(movies_meta.get(g), movies.get(i))){
                         System.out.printf("%1s %9s %7s %6s %5s %1s %"+ (max_3 - movies.get(i).length() + 1) + "s%n", "|",
-                                ansi().render("@|" + (scores.get(i).contains("?")? "cyan ": (Integer.parseInt(scores.get(i).substring(0, scores.get(i).length() - 1)) >= 60? "green":"red")) + scores.get(i) + "|@"),
+                                ansi().render("@|" + (scores.get(i).contains("?")? "cyan ": (Integer.parseInt(scores.get(i).substring(0,
+                                        scores.get(i).length() - 1)) >= 60 || scores.get(i).contains("100")? "green":"red")) + (scores.get(i).length() <= 2? " " + scores.get(i):scores.get(i)) + "|@"),
                                 "|",
                                 ansi().render("    @|" + (scores_meta.get(g).contains("?")? "cyan ": Integer.parseInt(scores_meta.get(g).substring(0, scores_meta.get(g).length())) > 60? "green ":Integer.parseInt(scores_meta.get(g).substring(0, scores_meta.get(g).length())) >= 40? "yellow ":"red ") + scores_meta.get(g) + "|@"),
                                 "|", movies.get(i), "|");
                         break;
                     } else if (g == movies_meta.size() - 1){
                         System.out.printf("%1s %1s %7s %6s %5s %1s %"+ (max_3 - movies.get(i).length() + 1) + "s%n", "|",
-                                ansi().render("      @|" + (scores.get(i).contains("?")? "cyan ": (Integer.parseInt(scores.get(i).substring(0, scores.get(i).length() - 1)) >= 60? "green ":"red ")) + scores.get(i) + "|@"),
+                                ansi().render("      @|" + (scores.get(i).contains("?")? "cyan ": (Integer.parseInt(scores.get(i).substring(0,
+                                        scores.get(i).length() - 1)) >= 60 || scores.get(i).contains("100")? "green ":"red ")) + (scores.get(i).length() <= 2? " " + scores.get(i):scores.get(i)) + "|@"),
                                 "|", ansi().render("    @|cyan ??|@"), "|", movies.get(i), "|");
                     }
                 }
@@ -238,8 +271,8 @@ public class Main {
     }
 
     public static void main(String[] args) {
+        output.printTable();
         try{
-            instructions();
             parseFrom();
         }
         catch(Exception e) {
@@ -247,3 +280,4 @@ public class Main {
         }
     }
 }
+
