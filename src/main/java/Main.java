@@ -76,8 +76,6 @@ public class Main {
                         } else{
                             if (Objects.equals(aCache, "100%")){
                                 scores.add("100");
-                            } else if (aCache.length() <= 2){
-                                scores.add(aCache);
                             } else {
                                 scores.add(aCache);
                             }
@@ -112,8 +110,6 @@ public class Main {
                     } else {
                         if (Objects.equals(aCache, "100%")){
                             scores.add("100");
-                        } else if (aCache.length() <= 2){
-                            scores.add(" " + aCache);
                         } else {
                             scores.add(aCache);
                         }
@@ -151,8 +147,6 @@ public class Main {
                         } else{
                             if (Objects.equals(aCache, "100%")){
                                 scores.add("100");
-                            } else if (aCache.length() <= 2){
-                                scores.add(" " + aCache);
                             } else {
                                 scores.add(aCache);
                             }
