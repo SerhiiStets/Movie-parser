@@ -201,7 +201,8 @@ public class Main {
                                 ansi().render("      @|" + (scores.get(i).contains("?")? "cyan ": (Integer.parseInt(scores.get(i).substring(0,
                                         scores.get(i).length() - 1)) >= 60 || scores.get(i).contains("100")? "green ":"red ")) + (scores.get(i).length() <= 2? " " + scores.get(i):scores.get(i)) + "|@"),
                                 "|",
-                                ansi().render("    @|" + (scores_meta.get(g).contains("?")? "cyan ": Integer.parseInt(scores_meta.get(g).substring(0, scores_meta.get(g).length())) > 60? "green ":Integer.parseInt(scores_meta.get(g).substring(0, scores_meta.get(g).length())) >= 40? "yellow ":"red ") + scores_meta.get(g) + "|@"),
+                                ansi().render("    @|" + (scores_meta.get(g).contains("?")? "cyan ": Integer.parseInt(scores_meta.get(g).substring(0, scores_meta.get(g).length())) > 60? "green ":Integer.parseInt(scores_meta.get(g).substring(0,
+                                        scores_meta.get(g).length())) >= 40? "yellow ":"red ") + (scores_meta.get(g).length() <= 1? " " + scores_meta.get(g):scores_meta.get(g)) + "|@"),
                                 "|", movies.get(i), "|");
                         break;
                     } else if (g == movies_meta.size() - 1 ){
@@ -224,7 +225,8 @@ public class Main {
                                 ansi().render("      @|" + (scores.get(i).contains("?")? "cyan ": (Integer.parseInt(scores.get(i).substring(0,
                                         scores.get(i).length() - 1)) >= 60 ||scores.get(i).contains("100")? "green ":"red ")) + (scores.get(i).length() <= 2? " " + scores.get(i):scores.get(i)) + "|@"),
                                 "|",
-                                ansi().render("    @|" + (scores_meta.get(g).contains("?")? "cyan ": Integer.parseInt(scores_meta.get(g).substring(0, scores_meta.get(g).length())) > 60? "green ":Integer.parseInt(scores_meta.get(g).substring(0, scores_meta.get(g).length())) >= 40? "yellow ":"red ") + scores_meta.get(g) + "|@"),
+                                ansi().render("    @|" + (scores_meta.get(g).contains("?")? "cyan ": Integer.parseInt(scores_meta.get(g).substring(0, scores_meta.get(g).length())) > 60? "green ":Integer.parseInt(scores_meta.get(g).substring(0,
+                                        scores_meta.get(g).length())) >= 40? "yellow ":"red ") + (scores_meta.get(g).length() <= 1? " " + scores_meta.get(g):scores_meta.get(g)) + "|@"),
                                 "|", money.get(i - 5), "|", movies.get(i), "|");
                         break;
                     } else if (g == movies_meta.size() - 1){
@@ -247,7 +249,8 @@ public class Main {
                                 ansi().render("@|" + (scores.get(i).contains("?")? "cyan ": (Integer.parseInt(scores.get(i).substring(0,
                                         scores.get(i).length() - 1)) >= 60 || scores.get(i).contains("100")? "green":"red")) + (scores.get(i).length() <= 2? " " + scores.get(i):scores.get(i)) + "|@"),
                                 "|",
-                                ansi().render("    @|" + (scores_meta.get(g).contains("?")? "cyan ": Integer.parseInt(scores_meta.get(g).substring(0, scores_meta.get(g).length())) > 60? "green ":Integer.parseInt(scores_meta.get(g).substring(0, scores_meta.get(g).length())) >= 40? "yellow ":"red ") + scores_meta.get(g) + "|@"),
+                                ansi().render("    @|" + (scores_meta.get(g).contains("?")? "cyan ": Integer.parseInt(scores_meta.get(g).substring(0, scores_meta.get(g).length())) > 60? "green ":Integer.parseInt(scores_meta.get(g).substring(0,
+                                        scores_meta.get(g).length())) >= 40? "yellow ":"red ") + (scores_meta.get(g).length() <= 1? " " + scores_meta.get(g):scores_meta.get(g)) + "|@"),
                                 "|", movies.get(i), "|");
                         break;
                     } else if (g == movies_meta.size() - 1){
