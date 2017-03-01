@@ -32,7 +32,12 @@ class output{
         System.out.println(ansi().render("\t\t@|red 27|@ - (@|red 0|@ - @|red 39|@) Generally Unfavorable Reviews / Overwhelming Dislike"));
         System.out.println(ansi().render("\t\t@|cyan ??|@ - No Score Yet"));
     }
+
     public static void printTable(){
+
+    }
+
+    public static void output_info(){
         instructions();
     }
 }
@@ -190,6 +195,7 @@ public class Main {
                 i++;
             }
 
+            output.printTable();
             // Show movies opening this week section
             System.out.println("\nMOVIES OPENING THIS WEEK\n");
             System.out.printf("%1s %"+ (max_1 % 2 == 0?((max_1 + 2) /2 + 2 ):((max_1 + 2) /2 + 3 )) + "s %" + ((max_1 / 2) -2) + "s%n", "| Rotten Tomatoes | Metacritic |", "Movies", "|");
@@ -197,7 +203,7 @@ public class Main {
             for (i = 0; i < 5; i++) {
                 for (g = 0; g < movies_meta.size(); g++){
                     if (Objects.equals(movies_meta.get(g), movies.get(i))){
-                        System.out.printf("%1s %9s %7s %6s %5s %1s %"+ (max_1 - movies.get(i).length() + 1) + "s%n", "|",
+                        System.out.printf("%1s %9s %7s %" + (scores_meta.get(g).equals("100")?"5":"6") + "s %5s %1s %"+ (max_1 - movies.get(i).length() + 1) + "s%n", "|",
                                 ansi().render("      @|" + (scores.get(i).contains("?")? "cyan ": (Integer.parseInt(scores.get(i).substring(0,
                                         scores.get(i).length() - 1)) >= 60 || scores.get(i).contains("100")? "green ":"red ")) + (scores.get(i).length() <= 2? " " + scores.get(i):scores.get(i)) + "|@"),
                                 "|",
@@ -221,7 +227,7 @@ public class Main {
             for (i = 5; i < 15; i++) {
                 for (g = 0; g < movies_meta.size(); g++){
                     if (Objects.equals(movies_meta.get(g), movies.get(i))){
-                        System.out.printf("%1s %9s %7s %6s %5s %" + max_2_1 + "s %1s %1s %"+ (max_2_2 - movies.get(i).length() + 1) + "s%n", "|",
+                        System.out.printf("%1s %9s %7s %" + (scores_meta.get(g).equals("100")?"5":"6") + "s %5s %" + max_2_1 + "s %1s %1s %"+ (max_2_2 - movies.get(i).length() + 1) + "s%n", "|",
                                 ansi().render("      @|" + (scores.get(i).contains("?")? "cyan ": (Integer.parseInt(scores.get(i).substring(0,
                                         scores.get(i).length() - 1)) >= 60 ||scores.get(i).contains("100")? "green ":"red ")) + (scores.get(i).length() <= 2? " " + scores.get(i):scores.get(i)) + "|@"),
                                 "|",
@@ -245,7 +251,7 @@ public class Main {
             for (i = 15; i < scores.size(); i++) {
                 for (g = 0; g < movies_meta.size(); g++){
                     if (Objects.equals(movies_meta.get(g), movies.get(i))){
-                        System.out.printf("%1s %9s %7s %6s %5s %1s %"+ (max_3 - movies.get(i).length() + 1) + "s%n", "|",
+                        System.out.printf("%1s %9s %7s %" + (scores_meta.get(g).equals("100")?"5":"6") + "s %5s %1s %"+ (max_3 - movies.get(i).length() + 1) + "s%n", "|",
                                 ansi().render("@|" + (scores.get(i).contains("?")? "cyan ": (Integer.parseInt(scores.get(i).substring(0,
                                         scores.get(i).length() - 1)) >= 60 || scores.get(i).contains("100")? "green":"red")) + (scores.get(i).length() <= 2? " " + scores.get(i):scores.get(i)) + "|@"),
                                 "|",
@@ -268,7 +274,7 @@ public class Main {
     }
 
     public static void main(String[] args) {
-        output.printTable();
+        output.instructions();
         try{
             parseFrom();
         }
@@ -277,4 +283,3 @@ public class Main {
         }
     }
 }
-
