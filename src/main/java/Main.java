@@ -4,11 +4,11 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import java.io.*;
+import java.nio.channels.InterruptedByTimeoutException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.nio.file.attribute.BasicFileAttributes;
 import java.nio.file.attribute.FileTime;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -25,12 +25,14 @@ import static org.fusesource.jansi.Ansi.ansi;
  */
 
 class Data{
+    // take last modified date of file
     private static String FileTime(FileTime fileTime) {
         DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy - hh:mm:ss");
         return dateFormat.format(fileTime.toMillis());
     }
 
-    private static String write_in_file(ArrayList<String> array){
+    // take all elements of array into string with |
+    private static String write_in_file(List<String> array){
         String msg = "";
         msg += array.get(0);
         for (int i = 1; i < array.size(); i++){
@@ -42,20 +44,23 @@ class Data{
 
 
     // Save data from last good session
-    static void save_last_session(ArrayList<String> list_movies, ArrayList<String> rotten_score, ArrayList<String> movies_to_compare, ArrayList<String> metascore, ArrayList<String> money){
-
+    static void save_last_session(List<String> list_movies, List<String> rotten_score, List<String> movies_to_compare, List<String> metascore, List<String> money_box, int m1, int m2, int m21, int m3){
         try {
             FileWriter writer = new FileWriter("last session.txt", false);
             writer.append(write_in_file(list_movies));
-            writer.append(write_in_file(rotten_score));
             writer.append(write_in_file(movies_to_compare));
+            writer.append(write_in_file(rotten_score));
             writer.append(write_in_file(metascore));
-            writer.append(write_in_file(money));
+            writer.append(write_in_file(money_box));
+            writer.append(m1 + ";");
+            writer.append(m2 + ";");
+            writer.append(m21 + ";");
+            writer.append(m3 + ";");
 
             writer.flush();
 
         }catch (IOException e){
-            System.out.println("\nFile error: " + e.getMessage());
+            System.err.println("\nFile error: " + e.getMessage());
         }
 
     }
@@ -64,8 +69,6 @@ class Data{
     static void take_last_session(){
         Path path = Paths.get("last session.txt");
         FileTime fileTime;
-        List<String> cache;
-        //ArrayList<String> cache = new ArrayList<>();
 
         try {
             List<String> lines = Files.readAllLines(path, StandardCharsets.UTF_8);
@@ -73,31 +76,43 @@ class Data{
                 if (line.contains("You have 0 updates")){
                     System.out.println(line);
                 } else{
-
                     try {
                         fileTime = Files.getLastModifiedTime(path);
-                        System.out.print("Your last update is : " + FileTime(fileTime));
+                        System.out.print("Your last update is : " + FileTime(fileTime) + "\n");
+
+
                     } catch (IOException e) {
                         System.err.println("Cannot get the last modified time - " + e);
                     }
+                    List<String> cache = Arrays.asList(line.split(";"));
+                    List<String> list_movies = Arrays.asList(cache.get(0).split("\\|"));
+                    List<String> movies_to_compare = Arrays.asList(cache.get(1).split("\\|"));
+                    List<String> rotten_score = Arrays.asList(cache.get(2).split("\\|"));
+                    List<String> metascore = Arrays.asList(cache.get(3).split("\\|"));
+                    List<String> money_box = Arrays.asList(cache.get(4).split("\\|"));
+                    int m1 = Integer.parseInt(cache.get(5));
+                    int m2 = Integer.parseInt(cache.get(6));
+                    int m21 = Integer.parseInt(cache.get(7));
+                    int m3 = Integer.parseInt(cache.get(8));
 
-                    cache = Arrays.asList(line.split(";"));
-                    System.out.print(cache);
+                    Output.movie_opening_this_week(list_movies, movies_to_compare, rotten_score,  metascore,  m1);
+                    Output.top_box_office(list_movies, movies_to_compare, rotten_score, metascore, money_box, m2, m21);
+                    Output.coming_soon(list_movies, movies_to_compare, rotten_score, metascore, m3);
+
+                    }
                 }
-            }
-
         } catch (IOException e){
-            System.out.println("\nFile error: " + e.getMessage());
+            System.err.println("\nFile error: " + e.getMessage());
         }
     }
 }
 
 class MovieParser {
-    private static ArrayList<String> scores = new ArrayList<>(); // All scores from Rotten Tomatoes
-    private static ArrayList<String> movies = new ArrayList<>(); // Movie names from Rotten Tomatoes
-    private static ArrayList<String> money = new ArrayList<>(); // Box office from Rotten Tomatoes
-    private static ArrayList<String> scores_meta = new ArrayList<>(); //  All scores from Metacritic
-    private static ArrayList<String> movies_meta = new ArrayList<>(); // Movie names from Metacritic
+    private static List<String> scores = new ArrayList<>(); // All scores from Rotten Tomatoes
+    private static List<String> movies = new ArrayList<>(); // Movie names from Rotten Tomatoes
+    private static List<String> money = new ArrayList<>(); // Box office from Rotten Tomatoes
+    private static List<String> scores_meta = new ArrayList<>(); //  All scores from Metacritic
+    private static List<String> movies_meta = new ArrayList<>(); // Movie names from Metacritic
     // Variables for table width
     private static int max_1 = "Movies".length();
     private static int max_2_1 = "$".length();
@@ -265,10 +280,10 @@ class MovieParser {
             metacritic(doc);
 
             table();
-            Data.save_last_session(movies, scores , movies_meta, scores_meta, money);
+            Data.save_last_session(movies, scores , movies_meta, scores_meta, money, max_1, max_2_1, max_2_2, max_3);
 
         }catch (IOException e) {
-            System.out.println("\nParse error: " + e.getMessage() + "\nCheck your internet connection\n");
+            System.err.println("\nParse error: " + e.getMessage() + "\nCheck your internet connection\n");
             Data.take_last_session();
         }
     }
@@ -290,7 +305,7 @@ class Output {
     }
 
 
-    static void movie_opening_this_week(ArrayList<String> movies_rotten , ArrayList<String> movies_metacritic, ArrayList<String> scores_rotten, ArrayList<String> scores_metacritic, int max){
+    static void movie_opening_this_week(List<String> movies_rotten , List<String> movies_metacritic, List<String> scores_rotten, List<String> scores_metacritic, int max){
         // Show movies opening this week section
         System.out.println("\nMOVIES OPENING THIS WEEK\n");
         System.out.printf("%1s %"+ (max % 2 == 0?((max + 2) /2 + 2 ):((max + 2) /2 + 3 )) + "s %" + ((max / 2) -2) + "s%n", "| Rotten Tomatoes | Metacritic |", "Movies", "|");
@@ -316,7 +331,7 @@ class Output {
         }
     }
 
-    static void top_box_office(ArrayList<String> movies_rotten , ArrayList<String> movies_metacritic, ArrayList<String> scores_rotten, ArrayList<String> scores_metacritic, ArrayList<String> box_office, int max_1, int max_2){
+    static void top_box_office(List<String> movies_rotten , List<String> movies_metacritic, List<String> scores_rotten, List<String> scores_metacritic, List<String> box_office, int max_1, int max_2){
         // Show top box office section
         System.out.println("\nTOP BOX OFFICE\n");
         System.out.printf("%1s %" + max_1 + "s %1s %" + (max_2 % 2 == 0?((max_2 + 2) /2 + 2 ):((max_2 + 2) /2 + 3 )) + "s %" + ((max_2 / 2) -2) + "s%n", "| Rotten Tomatoes | Metacritic |", "$", "|", "Movies", "|");
@@ -342,7 +357,7 @@ class Output {
         }
     }
 
-    static void coming_soon(ArrayList<String> movies_rotten , ArrayList<String> movies_metacritic, ArrayList<String> scores_rotten, ArrayList<String> scores_metacritic, int max){
+    static void coming_soon(List<String> movies_rotten , List<String> movies_metacritic, List<String> scores_rotten, List<String> scores_metacritic, int max){
         // Show coming soon to theaters section
         System.out.println("\nCOMING SOON TO THEATERS\n");
         System.out.printf("%1s %"+ (max % 2 == 0?((max + 2) /2 + 2 ):((max + 2) /2 + 3 )) + "s %" + ((max / 2) -2) + "s%n", "| Rotten Tomatoes | Metacritic |", "Movies", "|");
@@ -378,7 +393,7 @@ public class Main {
             MovieParser.parseFrom();
         }
         catch(Exception e) {
-            System.out.println("Error: " + e.getMessage());
+            System.err.println("Error: " + e.getMessage());
         }
     }
 }
