@@ -3,10 +3,16 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.Objects;
+import java.io.*;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.attribute.BasicFileAttributes;
+import java.nio.file.attribute.FileTime;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static org.fusesource.jansi.Ansi.ansi;
@@ -19,12 +25,70 @@ import static org.fusesource.jansi.Ansi.ansi;
  */
 
 class Data{
-    static void save_last_session(){
+    private static String FileTime(FileTime fileTime) {
+        DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy - hh:mm:ss");
+        return dateFormat.format(fileTime.toMillis());
+    }
+
+    private static String write_in_file(ArrayList<String> array){
+        String msg = "";
+        msg += array.get(0);
+        for (int i = 1; i < array.size(); i++){
+            msg += "|" + array.get(i);
+        }
+        msg += ";";
+        return msg;
+    }
+
+
+    // Save data from last good session
+    static void save_last_session(ArrayList<String> list_movies, ArrayList<String> rotten_score, ArrayList<String> movies_to_compare, ArrayList<String> metascore, ArrayList<String> money){
+
+        try {
+            FileWriter writer = new FileWriter("last session.txt", false);
+            writer.append(write_in_file(list_movies));
+            writer.append(write_in_file(rotten_score));
+            writer.append(write_in_file(movies_to_compare));
+            writer.append(write_in_file(metascore));
+            writer.append(write_in_file(money));
+
+            writer.flush();
+
+        }catch (IOException e){
+            System.out.println("\nFile error: " + e.getMessage());
+        }
 
     }
 
+    // take data from file if there is an error or no internet connection
     static void take_last_session(){
+        Path path = Paths.get("last session.txt");
+        FileTime fileTime;
+        List<String> cache;
+        //ArrayList<String> cache = new ArrayList<>();
 
+        try {
+            List<String> lines = Files.readAllLines(path, StandardCharsets.UTF_8);
+            for(String line: lines){
+                if (line.contains("You have 0 updates")){
+                    System.out.println(line);
+                } else{
+
+                    try {
+                        fileTime = Files.getLastModifiedTime(path);
+                        System.out.print("Your last update is : " + FileTime(fileTime));
+                    } catch (IOException e) {
+                        System.err.println("Cannot get the last modified time - " + e);
+                    }
+
+                    cache = Arrays.asList(line.split(";"));
+                    System.out.print(cache);
+                }
+            }
+
+        } catch (IOException e){
+            System.out.println("\nFile error: " + e.getMessage());
+        }
     }
 }
 
@@ -188,7 +252,6 @@ class MovieParser {
         Output.movie_opening_this_week(movies, movies_meta, scores, scores_meta, max_1);
         Output.top_box_office(movies, movies_meta, scores, scores_meta, money, max_2_1, max_2_2);
         Output.coming_soon(movies, movies_meta, scores, scores_meta, max_3);
-        Data.save_last_session();
     }
 
     static void parseFrom() throws Exception {
@@ -202,6 +265,7 @@ class MovieParser {
             metacritic(doc);
 
             table();
+            Data.save_last_session(movies, scores , movies_meta, scores_meta, money);
 
         }catch (IOException e) {
             System.out.println("\nParse error: " + e.getMessage() + "\nCheck your internet connection\n");
