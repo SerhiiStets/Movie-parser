@@ -18,7 +18,7 @@ Example:<br><br>
 
 ## Feedback
 
-All bugs, feature requests, pull requests, feedback, etc., are welcome. [Create an issue](https://github.com/adam-p/markdown-here/issues)
+All bugs, feature requests, pull requests, feedback, etc., are welcome. [Create an issue](https://github.com/SerhiiStets/Movie-parser/issues)
 
 ## Like it?
 You can say [thanks](https://saythanks.io/to/SerhiiStets)
