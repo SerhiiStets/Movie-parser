@@ -1,10 +1,10 @@
+import org.jsoup.Connection;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import java.io.*;
-import java.nio.channels.InterruptedByTimeoutException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -44,7 +44,7 @@ class Data{
 
 
     // Save data from last good session
-    static void save_last_session(List<String> list_movies, List<String> rotten_score, List<String> movies_to_compare, List<String> metascore, List<String> money_box, int m1, int m2, int m21, int m3){
+    public static void save_last_session(List<String> list_movies, List<String> rotten_score, List<String> movies_to_compare, List<String> metascore, List<String> money_box, int m1, int m2, int m21, int m3){
         try {
             FileWriter writer = new FileWriter("last session.txt", false);
             writer.append(write_in_file(list_movies));
@@ -66,7 +66,7 @@ class Data{
     }
 
     // take data from file if there is an error or no internet connection
-    static void take_last_session(){
+    public static void take_last_session(){
         Path path = Paths.get("last session.txt");
         FileTime fileTime;
 
@@ -99,8 +99,8 @@ class Data{
                     Output.top_box_office(list_movies, movies_to_compare, rotten_score, metascore, money_box, m2, m21);
                     Output.coming_soon(list_movies, movies_to_compare, rotten_score, metascore, m3);
 
-                    }
                 }
+            }
         } catch (IOException e){
             System.err.println("\nFile error: " + e.getMessage());
         }
@@ -233,35 +233,23 @@ class MovieParser {
         }
     }
 
-    private static void metacritic(Document text){
-        ArrayList<String> cache = new ArrayList<>();
-        int i = 0;
 
-        Elements elements = text.select(".overview-top"); // Take all elements in classes
-        for (Element e : elements) {
-            Elements elements1 = e.select("h4[itemprop=\"name\"]"); // Take movie name from itemprop
-            cache.addAll(elements1.stream().map(e1 -> e1.text().replaceAll(" \\(\\d+\\)",
-                    "").replace(" - [Limited]", "")).collect(Collectors.toList())); // Delete info in brackets and " - [Limited]"
-
-            Elements element2 = e.select(".metascore"); // Take metascore
-            cache.addAll(element2.stream().map(Element::text).collect(Collectors.toList())); // Add to our list
-        }
-        // My metascore element now looks like "Metascore: 43/100 (11 reviews)", we need to delete all after "/" and "Metascore: "
-        while (i < cache.size()-1){
-            // If next element have "Metascore" in it
-            if (cache.get(i+1).contains("Metascore")){
-                movies_meta.add(cache.get(i));
-                scores_meta.add(cache.get(i+1).replace("Metascore: ", "").split("/")[0]);
-                i++;
+    private static void metacritic(Document text) {
+        Elements title_meta = text.select("div[class=title");
+        movies_meta.addAll(title_meta.stream().map(Element::text).collect(Collectors.toList()));
+        Elements score_meta = text.select("a[class=metascore_anchor]");
+        for (Element score : score_meta) {
+            String linkHref = score.attr("href");
+            if (linkHref.contains("critic-reviews")) {
+                if (score.text().contains("tbd")){
+                    scores_meta.add("??");
+                } else{
+                    scores_meta.add(score.text());
+                }
             }
-            // If movie don't have score
-            else{
-                movies_meta.add(cache.get(i));
-                scores_meta.add("??");
-            }
-            i++;
         }
     }
+
 
     private static void table(){
         Output.movie_opening_this_week(movies, movies_meta, scores, scores_meta, max_1);
@@ -270,13 +258,14 @@ class MovieParser {
     }
 
     static void parseFrom() throws Exception {
-
         try {
             Document doc = Jsoup.connect("https://www.rottentomatoes.com/").get(); // Connect to Rotten Tomatoes
             rottentomatoes(doc);
 
-            // I have some troubles with Metacritic website so i take metascore from imdb.com instead
-            doc = Jsoup.connect("http://www.imdb.com/movies-in-theaters/?ref_=nv_mv_inth_1").timeout(0).get();
+            doc = Jsoup.connect("http://www.metacritic.com/browse/movies/release-date/theaters/date?ttype[]=1").timeout(5000).userAgent("Mozilla").get();
+            metacritic(doc);
+
+            doc = Jsoup.connect("http://www.metacritic.com/browse/movies/release-date/coming-soon/date").timeout(5000).userAgent("Mozilla").get();
             metacritic(doc);
 
             table();
