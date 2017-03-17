@@ -46,7 +46,7 @@ class Data{
     // Save data from last good session
     public static void save_last_session(List<String> list_movies, List<String> rotten_score, List<String> movies_to_compare, List<String> metascore, List<String> money_box, int m1, int m2, int m21, int m3){
         try {
-            FileWriter writer = new FileWriter("last session.txt", false);
+            FileWriter writer = new FileWriter("last_session.txt", false);
             writer.append(write_in_file(list_movies));
             writer.append(write_in_file(movies_to_compare));
             writer.append(write_in_file(rotten_score));
@@ -67,7 +67,7 @@ class Data{
 
     // take data from file if there is an error or no internet connection
     public static void take_last_session(){
-        Path path = Paths.get("last session.txt");
+        Path path = Paths.get("last_session.txt");
         FileTime fileTime;
 
         try {
@@ -277,6 +277,7 @@ class MovieParser {
         }
     }
 }
+
 
 class Output {
     public static void instructions(){
