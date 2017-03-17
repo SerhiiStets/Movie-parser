@@ -257,7 +257,7 @@ class MovieParser {
         Output.coming_soon(movies, movies_meta, scores, scores_meta, max_3);
     }
 
-    static void parseFrom() throws Exception {
+    public static void parseFrom() throws Exception {
         try {
             Document doc = Jsoup.connect("https://www.rottentomatoes.com/").get(); // Connect to Rotten Tomatoes
             rottentomatoes(doc);
@@ -279,7 +279,7 @@ class MovieParser {
 }
 
 class Output {
-    static void instructions(){
+    public static void instructions(){
         // Instruction block
         System.out.println("\nINSTRUCTION\n");
         System.out.println("\tRotten Tomatoes:");
@@ -294,7 +294,7 @@ class Output {
     }
 
 
-    static void movie_opening_this_week(List<String> movies_rotten , List<String> movies_metacritic, List<String> scores_rotten, List<String> scores_metacritic, int max){
+    public static void movie_opening_this_week(List<String> movies_rotten , List<String> movies_metacritic, List<String> scores_rotten, List<String> scores_metacritic, int max){
         // Show movies opening this week section
         System.out.println("\nMOVIES OPENING THIS WEEK\n");
         System.out.printf("%1s %"+ (max % 2 == 0?((max + 2) /2 + 2 ):((max + 2) /2 + 3 )) + "s %" + ((max / 2) -2) + "s%n", "| Rotten Tomatoes | Metacritic |", "Movies", "|");
@@ -320,33 +320,33 @@ class Output {
         }
     }
 
-    static void top_box_office(List<String> movies_rotten , List<String> movies_metacritic, List<String> scores_rotten, List<String> scores_metacritic, List<String> box_office, int max_1, int max_2){
+    public static void top_box_office(List<String> movies_rotten , List<String> movies_metacritic, List<String> scores_rotten, List<String> scores_metacritic, List<String> box_office, int max_1, int max_2){
         // Show top box office section
         System.out.println("\nTOP BOX OFFICE\n");
-        System.out.printf("%1s %" + max_1 + "s %1s %" + (max_2 % 2 == 0?((max_2 + 2) /2 + 2 ):((max_2 + 2) /2 + 3 )) + "s %" + ((max_2 / 2) -2) + "s%n", "| Rotten Tomatoes | Metacritic |", "$", "|", "Movies", "|");
-        System.out.printf("%1s %17s %12s %" + (max_1 + 2) + "s %" + (max_2 + 2) + "s%n", "|", "|", "|", "|", "|");
+        System.out.printf("%1s %" + (max_2 % 2 == 0?((max_2 + 2) /2 + 2 ):((max_2 + 2) /2 + 3 )) + "s %" + ((max_2 / 2) -2) + "s %" + max_1 + "s %1s%n", "| Rotten Tomatoes | Metacritic |", "Movies", "|", "$", "|");
+        System.out.printf("%1s %17s %12s %" + (max_2 + 2) + "s %" + (max_1 + 2) + "s%n", "|", "|", "|", "|", "|");
         for (int i = 5; i < 15; i++) {
             for (int g = 0; g < movies_metacritic.size(); g++){
                 if (Objects.equals(movies_metacritic.get(g), movies_rotten.get(i))){
-                    System.out.printf("%1s %9s %7s %" + (scores_metacritic.get(g).equals("100")?"5":"6") + "s %5s %" + max_1 + "s %1s %1s %"+ (max_2 - movies_rotten.get(i).length() + 1) + "s%n", "|",
+                    System.out.printf("%1s %9s %7s %" + (scores_metacritic.get(g).equals("100")?"5":"6") + "s %5s %1s %"+ (max_2 - movies_rotten.get(i).length() + 1) + "s %" + max_1 + "s %1s%n", "|",
                             ansi().render("      @|" + (scores_rotten.get(i).contains("?")? "cyan ": (Integer.parseInt(scores_rotten.get(i).substring(0,
                                     scores_rotten.get(i).length() - 1)) >= 60 || scores_rotten.get(i).contains("100")? "green ":"red ")) + (scores_rotten.get(i).length() <= 2? " " + scores_rotten.get(i):scores_rotten.get(i)) + "|@"),
                             "|",
                             ansi().render("    @|" + (scores_metacritic.get(g).contains("?")? "cyan ": Integer.parseInt(scores_metacritic.get(g).substring(0, scores_metacritic.get(g).length())) > 60? "green ":Integer.parseInt(scores_metacritic.get(g).substring(0,
                                     scores_metacritic.get(g).length())) >= 40? "yellow ":"red ") + (scores_metacritic.get(g).length() <= 1? " " + scores_metacritic.get(g):scores_metacritic.get(g)) + "|@"),
-                            "|", box_office.get(i - 5), "|", movies_rotten.get(i), "|");
+                            "|", movies_rotten.get(i), "|", box_office.get(i - 5), "|");
                     break;
                 } else if (g == movies_metacritic.size() - 1){
-                    System.out.printf("%1s %9s %7s %6s %5s %" + max_1 + "s %1s %1s %"+ (max_2 - movies_rotten.get(i).length() + 1) + "s%n", "|",
+                    System.out.printf("%1s %9s %7s %6s %5s %1s %"+ (max_2 - movies_rotten.get(i).length() + 1) + "s %" + max_1 + "s %1s%n", "|",
                             ansi().render("      @|" + (scores_rotten.get(i).contains("?")? "cyan ": (Integer.parseInt(scores_rotten.get(i).substring(0,
                                     scores_rotten.get(i).length() - 1)) >= 60 || scores_rotten.get(i).contains("100")? "green ":"red ")) + (scores_rotten.get(i).length() <= 2? " " + scores_rotten.get(i):scores_rotten.get(i)) + "|@"),
-                            "|", ansi().render("    @|cyan ??|@"), "|", box_office.get(i - 5), "|", movies_rotten.get(i), "|");
+                            "|", ansi().render("    @|cyan ??|@"), "|", movies_rotten.get(i), "|", box_office.get(i - 5), "|");
                 }
             }
         }
     }
 
-    static void coming_soon(List<String> movies_rotten , List<String> movies_metacritic, List<String> scores_rotten, List<String> scores_metacritic, int max){
+    public static void coming_soon(List<String> movies_rotten , List<String> movies_metacritic, List<String> scores_rotten, List<String> scores_metacritic, int max){
         // Show coming soon to theaters section
         System.out.println("\nCOMING SOON TO THEATERS\n");
         System.out.printf("%1s %"+ (max % 2 == 0?((max + 2) /2 + 2 ):((max + 2) /2 + 3 )) + "s %" + ((max / 2) -2) + "s%n", "| Rotten Tomatoes | Metacritic |", "Movies", "|");
