@@ -1,7 +1,9 @@
 .gradle
 .idea
 build/
+last_session.txt
 src/main/main.iml
+
 
 # Ignore Gradle GUI config
 gradle-app.setting

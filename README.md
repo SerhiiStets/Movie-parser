@@ -14,14 +14,12 @@ Clone this repo<br>
 ## Usage
 <pre>gradle -q run</pre>
 Example:<br><br>
-![screenshot of sample](https://cloud.githubusercontent.com/assets/17416048/23826236/118b87d2-06a1-11e7-9bb3-616e489f17fd.PNG)
+![screenshot](https://cloud.githubusercontent.com/assets/17416048/24034939/fc0cba8e-0afb-11e7-9a79-f6ffe5d0aeab.PNG)
 
 ## Feedback
 
 All bugs, feature requests, pull requests, feedback, etc., are welcome. [Create an issue](https://github.com/SerhiiStets/Movie-parser/issues)
 
-## Like it?
-You can say [thanks](https://saythanks.io/to/SerhiiStets)
 
 ## License
 
